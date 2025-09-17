@@ -1,0 +1,7 @@
+<h2>Mascotas</h2>
+<div class="card" ng-repeat="m in mascotas">
+  <h3>{{m.nombre}} ({{m.sexo}})</h3>
+  <p><b>Raza:</b> {{m.raza || 'No especificada'}}</p>
+  <p><b>Peso:</b> {{m.peso}} kg</p>
+  <p><b>Condiciones:</b> {{m.condiciones}}</p>
+</div>

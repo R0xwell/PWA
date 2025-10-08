@@ -1,0 +1,23 @@
+{
+  "name": "dfhash.com",
+  "short_name": "dfhash.com",
+  "icons": [
+      {
+        "src": "/testdashboard/resources/icono.png",
+        "sizes": "512x512",
+        "type": "image/png"
+      },
+      {
+        "src": "/testbooard/resources/icono-maskable.png",
+        "sizes": "512x512",
+        "type": "image/png",
+        "purpose": "maskable"
+      }
+  ],
+  "id": "/?source=pwa",
+  "start_url": "/?source=pwa",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#008080",
+  "theme_color": "#008080"
+}

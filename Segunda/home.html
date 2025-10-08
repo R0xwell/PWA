@@ -1,1 +1,155 @@
+<!DOCTYPE html>
+<html lang="es" ng-app="refugioApp">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Refugio Animal</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular-route.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular-animate.min.js"></script>
+  <script src="js/app.js"></script>
+   <link rel="stylesheet" href="./css/index.css">
 
+</head>
+<body>
+  <header>
+    <div class="header-left">
+      <div class="logo">
+        <img src="resources/veterinaria_bigotes.png" alt="Logo Refugio Animal">
+      </div>
+      <h1>Refugio Animal</h1>
+    </div>
+
+    <nav>
+      <a href="home.html">Inicio</a>
+      <a href="./views/mascotas.html">Mascotas</a>
+      <a href="./views/padrinos.html">Padrinos</a>
+      <a href="./views/apoyos.html">Apoyos</a>
+      <a href="./views/notifications.html">Notificaciones</a>
+
+      <!-- Botón hamburguesa -->
+      <button id="openPanelBtn" class="menu-btn" aria-label="Abrir menú">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </nav>
+  </header>
+
+  <main>
+    <div class="container">
+      <div class="view-animate" ng-view></div>
+    </div>
+
+    <!-- Panel lateral -->
+    <div id="sidePanel" class="side-panel">
+      <div class="side-panel-header">
+        <span style="font-size:1.2rem;font-weight:bold;">Configuración</span>
+        <button id="closePanelBtn" style="background:none;border:none;font-size:1.5rem;cursor:pointer;">&times;</button>
+      </div>
+
+      <div class="side-panel-content">
+        <h3>⚙️ Configuración del sitio</h3>
+        <label><input type="checkbox" id="langToggle"> Cambiar idioma (Español / Inglés)</label>
+        <label><input type="checkbox" id="notifyToggle"> Ajustar notificaciones</label>
+        <label><input type="checkbox" id="accessibilityToggle"> Activar accesibilidad (alto contraste, texto grande)</label>
+
+        <h3>🎨 Personalización visual</h3>
+        <label><input type="checkbox" id="darkModeToggle"> Modo claro / oscuro</label>
+
+        <label>Color principal:</label>
+        <select id="colorSelector">
+          <option value="#0a8f36" selected>Verde</option>
+          <option value="#007bff">Azul</option>
+          <option value="#ff9800">Naranja</option>
+        </select>
+
+        <label>Tamaño de fuente:</label>
+        <select id="fontSizeSelector">
+          <option value="16px">Pequeña</option>
+          <option value="18px" selected>Mediana</option>
+          <option value="20px">Grande</option>
+
+        </select>
+
+        <h3>🖌️ Personalizar interfaz</h3>
+        <label>Color de fondo:</label>
+        <input type="color" id="bgColorPicker" value="#f9f9f9">
+
+        <label><input type="checkbox" id="animToggle" checked> Activar animaciones</label>
+      </div>
+    </div>
+
+    <!-- Imágenes -->
+    <div class="imagenestest" id="imagenestest">
+      <img src="https://th.bing.com/th/id/R.b4a35952996b0363fb3b3823d171a8e8?rik=yPmvd9x3vMBR5Q&riu=http%3a%2f%2fc.files.bbci.co.uk%2f48DD%2fproduction%2f_107435681_perro1.jpg&ehk=LcxYxmKeK6CKzYChIUt5UGL2G3Zapsyy1nEJgOZAq3M%3d&risl=&pid=ImgRaw&r=0" alt="Bienvenida1">
+      <img src="https://th.bing.com/th/id/R.6307e744b77f0d75c331314445c8e35c?rik=VkUP4SEEnu4Y3g&riu=http%3a%2f%2f4.bp.blogspot.com%2f-iUmDr6ACLk0%2fVaz8A2iOHRI%2fAAAAAAAAABM%2fnT_rdVS2IyM%2fs1600%2fperro-4.jpg&ehk=mFP%2fymTsL4Nq2KSnB9dtSJb%2fDW1Vu3GfLaSQJV7axB0%3d&risl=&pid=ImgRaw&r=0" alt="Bienvenida2">
+    </div>
+  </main>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const panel = document.getElementById('sidePanel');
+      const openBtn = document.getElementById('openPanelBtn');
+      const closeBtn = document.getElementById('closePanelBtn');
+
+      openBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        panel.classList.toggle('open');
+        openBtn.classList.toggle('open');
+      });
+
+      closeBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        panel.classList.remove('open');
+        openBtn.classList.remove('open');
+      });
+
+      document.addEventListener('click', function(e) {
+        if (panel.classList.contains('open') && !panel.contains(e.target) && e.target !== openBtn) {
+          panel.classList.remove('open');
+          openBtn.classList.remove('open');
+        }
+      });
+
+      // Funciones de personalización (simples)
+      document.getElementById('darkModeToggle').addEventListener('change', function() {
+        document.body.classList.toggle('dark', this.checked);
+      });
+
+      document.getElementById('colorSelector').addEventListener('change', function() {
+        document.documentElement.style.setProperty('--main-color', this.value);
+      });
+
+      document.getElementById('fontSizeSelector').addEventListener('change', function() {
+        document.body.style.fontSize = this.value;
+      });
+
+      document.getElementById('bgColorPicker').addEventListener('input', function() {
+        document.documentElement.style.setProperty('--bg-color', this.value);
+      });
+
+      document.getElementById('animToggle').addEventListener('change', function() {
+        document.body.style.transition = this.checked ? 'all 0.3s ease' : 'none';
+      });
+
+      document.getElementById('accessibilityToggle').addEventListener('change', function() {
+        if (this.checked) {
+          document.body.style.filter = 'contrast(1.3)';
+          document.body.style.fontSize = '20px';
+        } else {
+          document.body.style.filter = 'none';
+          document.body.style.fontSize = '';
+        }
+      });
+    });
+  </script>
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./pwa-sw.js', { scope: './' })
+    .then(reg => console.log("✅ SW registrado:", reg.scope))
+    .catch(err => console.error("❌ Error al registrar SW:", err));
+}
+</script>
+</body>
+</html>

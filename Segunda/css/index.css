@@ -1,0 +1,248 @@
+    :root {
+      --main-color: #0a8f36;
+      --bg-color: #f9f9f9;
+      --text-color: #333;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: var(--bg-color);
+      color: var(--text-color);
+      overflow-x: hidden;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    /* Header: ahora agrupamos logo + título en la izquierda y nav a la derecha */
+    header {
+      background: var(--main-color);
+      color: white;
+      padding: 1rem 2rem; /* más espacio lateral para que no quede pegado */
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: nowrap; /* evitar que los elementos principales salten de línea */
+      gap: 1rem;
+    }
+
+    /* Agrupador izquierdo: logo + título */
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      min-width: 0; /* permite que el título se reduzca si hace falta */
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 1.6rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* NAV: ahora es un flex horizontal estable */
+    nav {
+      display: flex;
+      align-items: center;
+      gap: 1rem;            /* separación entre enlaces */
+      white-space: nowrap;  /* evitar que los enlaces se dividan en varias líneas */
+    }
+
+    /* Estilo de los enlaces */
+    nav a {
+      text-decoration: none;
+      color: white;
+      font-weight: bold;
+      padding: 0.25rem 0.5rem; /* un poco de "aire" alrededor del texto */
+      border-radius: 4px;
+      transition: background 0.2s ease;
+    }
+
+    nav a:hover {
+      background: rgba(255, 255, 255, 0.15);
+      text-decoration: none;
+    }
+
+    /* Aseguramos que el botón quede al final de la fila de nav */
+    nav .menu-btn {
+      margin-left: 0; /* no necesario empujarlo con auto porque el nav ya está a la derecha */
+    }
+
+    .logo img {
+      height: 100px;
+      display: block;
+      max-width: 100%;
+    }
+
+    .container {
+      padding: 2rem;
+      max-width: 900px;
+      margin: auto;
+      position: relative;
+      min-height: 300px;
+    }
+
+    h2 {
+      color: var(--main-color);
+    }
+
+    /* =====================
+       BOTÓN HAMBURGUESA
+    ====================== */
+    .menu-btn {
+      width: 36px;
+      height: 28px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+    }
+
+    .menu-btn span {
+      display: block;
+      height: 4px;
+      background: white;
+      border-radius: 2px;
+      transition: all 0.3s ease;
+    }
+
+    .menu-btn.open span:nth-child(1) {
+      transform: rotate(45deg) translate(6px, 6px);
+    }
+
+    .menu-btn.open span:nth-child(2) {
+      opacity: 0;
+    }
+
+    .menu-btn.open span:nth-child(3) {
+      transform: rotate(-45deg) translate(6px, -6px);
+    }
+
+    /* =====================
+       PANEL LATERAL IZQUIERDO
+    ====================== */
+    .side-panel {
+      position: fixed;
+      top: 0;
+      left: -350px;
+      width: 320px;
+      height: 100%;
+      background: #fff;
+      box-shadow: 2px 0 8px rgba(0,0,0,0.15);
+      z-index: 9999;
+      transition: left 0.3s cubic-bezier(.4,0,.2,1);
+      border-top-right-radius: 12px;
+      border-bottom-right-radius: 12px;
+      overflow-y: auto;
+    }
+
+    .side-panel.open {
+      left: 0;
+    }
+
+    .side-panel-header {
+      padding: 1rem;
+      background: var(--main-color);
+      color: #fff;
+      border-top-right-radius: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .side-panel-content {
+      padding: 1.2rem;
+    }
+
+    .side-panel-content h3 {
+      color: var(--main-color);
+      margin-top: 1.5rem;
+      font-size: 1.1rem;
+    }
+
+    .side-panel-content label {
+      display: block;
+      margin: 0.5rem 0;
+    }
+
+    /* =====================
+       IMÁGENES RESPONSIVE
+    ====================== */
+    .imagenestest {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 1rem;
+      padding: 1rem;
+    }
+
+    .imagenestest img {
+      width: 100%;
+      max-width: 400px;
+      height: auto;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      transition: transform 0.3s ease;
+    }
+
+    .imagenestest img:hover {
+      transform: scale(1.03);
+    }
+
+    /* MODO OSCURO */
+    body.dark {
+      background: #121212;
+      color: #f1f1f1;
+    }
+    body.dark header {
+      background: #333;
+    }
+
+    /* ====== RESPONSIVE ====== */
+    @media (max-width: 1024px) {
+      /* reducimos un poco la imagen del logo para evitar saltos de línea en pantallas medias */
+      .logo img {
+        height: 80px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      header {
+        flex-direction: column;
+        align-items: flex-start;
+        text-align: left;
+        padding: 1rem;
+      }
+
+      /* en móvil el nav ocupará todo el ancho y mantendrá botón al final */
+      nav {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        width: 100%;
+        justify-content: space-between;
+      }
+
+      .logo img {
+        height: 80px;
+      }
+
+      .imagenestest {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .imagenestest img {
+        max-width: 90%;
+      }
+
+      /* el botón se sitúa al final en el eje del nav */
+      .menu-btn {
+        align-self: flex-end;
+      }
+    }

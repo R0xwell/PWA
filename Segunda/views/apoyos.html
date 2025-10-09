@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="es" ng-app="refugioApp">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Módulo Apoyos - Refugio Animal</title>
+
+  <!-- AngularJS -->
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular-route.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular-animate.min.js"></script>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="../css/index.css">
+
+  <style>
+    .apoyos-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+    }
+    .apoyos-table th, .apoyos-table td {
+      border: 1px solid #ccc;
+      padding: 0.5rem;
+      text-align: left;
+    }
+    .apoyos-table th {
+      background-color: var(--main-color);
+      color: white;
+    }
+    .form-inline input {
+      margin-right: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+    .add-apoyo {
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body ng-controller="ApoyosCtrl">
+
+<header>
+  <div class="header-left">
+    <div class="logo">
+      <img src="../resources/veterinaria_bigotes.png" alt="Logo Refugio Animal">
+    </div>
+    <h1>Refugio Animal</h1>
+  </div>
+
+  <nav>
+    <a href="../home.html">Inicio</a>
+    <a href="./mascotas.html">Mascotas</a>
+    <a href="./padrinos.html">Padrinos</a>
+    <a href="./apoyos.html">Apoyos</a>
+    <a href="./notifications.html">Notificaciones</a>
+  </nav>
+</header>
+
+<main>
+  <div class="container">
+    <h2>💰 Apoyos</h2>
+
+    <!-- Formulario para agregar apoyo -->
+    <div class="form-inline">
+      <input type="number" ng-model="newApoyo.idMascota" placeholder="ID Mascota">
+      <input type="number" ng-model="newApoyo.idPadrino" placeholder="ID Padrino">
+      <input type="number" ng-model="newApoyo.monto" placeholder="Monto">
+      <input type="text" ng-model="newApoyo.causa" placeholder="Causa">
+      <button class="add-apoyo" ng-click="addApoyo()">Agregar</button>
+    </div>
+
+    <!-- Tabla de apoyos -->
+    <table class="apoyos-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>ID Mascota</th>
+          <th>ID Padrino</th>
+          <th>Monto</th>
+          <th>Causa</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr ng-repeat="apoyo in apoyos track by apoyo.idApoyo">
+          <td>{{apoyo.idApoyo}}</td>
+          <td>{{apoyo.idMascota || 'N/A'}}</td>
+          <td>{{apoyo.idPadrino || 'N/A'}}</td>
+          <td>{{apoyo.monto | currency}}</td>
+          <td>{{apoyo.causa || 'Sin causa registrada'}}</td>
+          <td>
+            <button ng-click="removeApoyo(apoyo.idApoyo)">Eliminar</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</main>
+
+<script>
+angular.module('refugioApp', [])
+.controller('ApoyosCtrl', function($scope) {
+  // Cargar apoyos desde localStorage
+  $scope.apoyos = JSON.parse(localStorage.getItem('apoyos')) || [];
+  $scope.newApoyo = {};
+
+  // Agregar un nuevo apoyo
+  $scope.addApoyo = function() {
+    if (!$scope.newApoyo.monto || !$scope.newApoyo.causa) return;
+
+    const nextId = $scope.apoyos.length 
+      ? Math.max(...$scope.apoyos.map(a => a.idApoyo)) + 1 
+      : 1;
+
+    $scope.apoyos.push({ idApoyo: nextId, ...$scope.newApoyo });
+    $scope.newApoyo = {};
+    localStorage.setItem('apoyos', JSON.stringify($scope.apoyos));
+  };
+
+  // Eliminar apoyo
+  $scope.removeApoyo = function(id) {
+    $scope.apoyos = $scope.apoyos.filter(a => a.idApoyo !== id);
+    localStorage.setItem('apoyos', JSON.stringify($scope.apoyos));
+  };
+});
+</script>
+
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./pwa-sw.js', { scope: './' })
+    .then(reg => console.log("✅ SW registrado:", reg.scope))
+    .catch(err => console.error("❌ Error al registrar SW:", err));
+}
+</script>
+
+</body>
+</html>

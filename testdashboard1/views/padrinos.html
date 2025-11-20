@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="es" ng-app="refugioApp">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Módulo Padrinos - Refugio Animal</title>
+
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+<link rel="stylesheet" href="../css/index.css">
+
+<style>
+:root {
+  --main-color: #4CAF50;
+  --accent-color: #388E3C;
+  --danger-color: #f44336;
+  --info-color: #2196F3;
+  --bg-color: #f9f9f9;
+}
+body { background: var(--bg-color); font-family: 'Segoe UI', sans-serif; }
+.container { background:white; padding:2rem; margin:2rem auto; border-radius:12px; box-shadow:0 4px 10px rgba(0,0,0,0.1); max-width:950px; }
+.form-box { background:#e8f5e9; padding:1rem; border-radius:10px; margin-bottom:1.5rem; display:flex; flex-wrap:wrap; gap:0.5rem; align-items:center; }
+.form-box input, .form-box select { flex:1; padding:0.5rem 0.8rem; border:1px solid #ccc; border-radius:6px; }
+.form-box button { background: var(--main-color); color:white; border:none; padding:0.6rem 1.2rem; border-radius:6px; cursor:pointer; transition: background 0.3s; }
+.form-box button:hover { background: var(--accent-color); }
+
+table { width:100%; border-collapse:collapse; }
+th, td { padding:0.8rem; border-bottom:1px solid #ddd; text-align:left; }
+th { background: var(--main-color); color:white; }
+tr.offline { background-color:#fff3cd !important; }
+tr.offline td { color:#795548; }
+
+button.action { border:none; padding:0.4rem 0.8rem; border-radius:6px; cursor:pointer; margin-right:4px; color:white; }
+button.edit { background-color: var(--info-color); }
+button.delete { background-color: var(--danger-color); }
+button.edit:hover { background-color:#1976D2; }
+button.delete:hover { background-color:#d32f2f; }
+
+/* Modal */
+.modal-bg { display:none; position:fixed; inset:0; background: rgba(0,0,0,0.5); justify-content:center; align-items:center; }
+.modal { background:white; padding:1.5rem; border-radius:10px; width:400px; max-width:90%; }
+.modal input, .modal select { width:100%; margin-bottom:0.8rem; padding:0.5rem; border-radius:6px; border:1px solid #ccc; }
+.modal button { width:48%; padding:0.6rem; border:none; border-radius:6px; cursor:pointer; color:white; }
+.modal .save { background:var(--main-color); }
+.modal .cancel { background:var(--danger-color); }
+</style>
+</head>
+
+<body ng-controller="PadrinosCtrl">
+
+<header>
+  <div class="header-left">
+    <div class="logo"><img src="../resources/veterinaria_bigotes.png" alt="Logo Refugio Animal"></div>
+    <h1>Refugio Animal</h1>
+  </div>
+  <nav>
+    <a href="./mascotas.html">Mascotas</a>
+    <a href="./padrinos.html">Padrinos</a>
+    <a href="./apoyos.html">Apoyos</a>
+    <a href="./notifications.html">Notificaciones</a>
+    <a href="#" ng-click="cerrarSesion()">Cerrar sesión</a>
+  </nav>
+</header>
+
+<main>
+<div class="container">
+  <h2>💛 Padrinos</h2>
+
+  <p ng-if="offline" style="color:red;">⚠ Estás en modo offline (los padrinos se guardarán localmente)</p>
+  <p ng-if="!offline" style="color:green;">🟢 Conectado al servidor</p>
+
+  <!-- Formulario agregar -->
+  <div class="form-box">
+    <input type="text" ng-model="newPadrino.nombrePadrino" placeholder="Nombre del padrino">
+    <select ng-model="newPadrino.sexo">
+      <option value="">Sexo</option>
+      <option value="M">M</option>
+      <option value="F">F</option>
+    </select>
+    <input type="tel" ng-model="newPadrino.telefono" placeholder="Teléfono">
+    <input type="email" ng-model="newPadrino.correoElectronico" placeholder="Correo electrónico">
+    <button ng-click="addPadrino()">Agregar</button>
+  </div>
+
+  <!-- Tabla padrinos -->
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Nombre</th>
+        <th>Sexo</th>
+        <th>Teléfono</th>
+        <th>Correo Electrónico</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr ng-repeat="padrino in padrinos track by padrino.idPadrino" ng-class="{'offline': padrino.offline}">
+        <td>{{padrino.idPadrino}}</td>
+        <td>{{padrino.nombrePadrino}} <span ng-if="padrino.offline">⚠️</span></td>
+        <td>{{padrino.sexo || 'N/A'}}</td>
+        <td>{{padrino.telefono}}</td>
+        <td>{{padrino.correoElectronico}}</td>
+        <td>
+          <button class="action edit" ng-click="openEditModal(padrino)">Editar</button>
+          <button class="action delete" ng-click="removePadrino(padrino.idPadrino)">Eliminar</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+</main>
+
+<!-- Modal de edición -->
+<div class="modal-bg" id="editModal">
+  <div class="modal">
+    <h3>Editar Padrino</h3>
+    <input type="text" ng-model="editPadrinoData.nombrePadrino" placeholder="Nombre">
+    <select ng-model="editPadrinoData.sexo">
+      <option value="M">M</option>
+      <option value="F">F</option>
+    </select>
+    <input type="tel" ng-model="editPadrinoData.telefono" placeholder="Teléfono">
+    <input type="email" ng-model="editPadrinoData.correoElectronico" placeholder="Correo electrónico">
+    <div style="display:flex;justify-content:space-between;">
+      <button class="save" ng-click="saveEdit()">Guardar</button>
+      <button class="cancel" ng-click="closeEditModal()">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- 🔥 Firebase Messaging -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
+import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-messaging.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDYdFd-39KDzADVcfurLdT9_W2cAIChFRA",
+  authDomain: "refugioanimal-b6096.firebaseapp.com",
+  projectId: "refugioanimal-b6096",
+  storageBucket: "refugioanimal-b6096.firebasestorage.app",
+  messagingSenderId: "122878637057",
+  appId: "1:122878637057:web:951a15ed750ce8fca27c00",
+  measurementId: "G-80E0ZTSZWP"
+};
+
+const app = initializeApp(firebaseConfig);
+const messaging = getMessaging(app);
+
+// ===================================================================================
+// 🔔 REGISTRAR SERVICE WORKER + PEDIR PERMISOS + OBTENER TOKEN
+// ===================================================================================
+async function registrarNotificaciones() {
+  console.log("🔔 Iniciando configuración de notificaciones...");
+
+  // 1️⃣ Solicitar permiso
+  const permiso = await Notification.requestPermission();
+
+  if (permiso !== "granted") {
+    console.warn("🚫 Permiso de notificaciones denegado");
+    return;
+  }
+
+  try {
+    // 2️⃣ Registrar service worker correcto
+    const registration = await navigator.serviceWorker.register("/testdashboard1/pwa-sw.js");
+
+    console.log("✅ SW registrado:", registration.scope);
+
+    // 3️⃣ Obtener token FCM
+    const token = await getToken(messaging, {
+      vapidKey: "BJI5wstaYYYL2QXhnns6lVCFU8SzjT5_yUlEwJ5qrSk3v5dYiCe37cLyetXNQ0Cn3IlYHAKrrEhOdYQe1TwbVNo",
+      serviceWorkerRegistration: registration
+    });
+
+    if (!token) {
+      console.warn("⚠️ No se pudo obtener token FCM");
+      return;
+    }
+
+    console.log("🔑 Token FCM obtenido:", token);
+
+    // 4️⃣ Guardar token en tu servidor
+    await fetch("/testdashboard1/php/guardar_token.php", {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: "token=" + encodeURIComponent(token)
+    });
+
+    console.log("📩 Token guardado correctamente.");
+
+  } catch (error) {
+    console.error("❌ Error al registrar notificaciones:", error);
+  }
+}
+
+// ===================================================================================
+// 📨 NOTIFICACIONES EN FOREGROUND (Cuando el usuario está usando la app)
+// ===================================================================================
+onMessage(messaging, (payload) => {
+  console.log("📨 Notificación recibida en foreground:", payload);
+
+  const { title, body, icon } = payload.notification || {};
+
+  const notificationData = {
+    body: body || "Tienes una nueva notificación",
+    icon: icon || "/testdashboard1/resources/icon-512x512.png"
+  };
+
+  if (Notification.permission === "granted") {
+    navigator.serviceWorker.ready.then((registration) => {
+      registration.showNotification(title || "Notificación", notificationData);
+    }).catch((err) => {
+      console.warn("⚠️ No se pudo usar el Service Worker:", err);
+      new Notification(title || "Notificación", notificationData); 
+    });
+  }
+});
+
+// ===================================================================================
+// 🚀 INICIAR TODO
+// ===================================================================================
+window.addEventListener("DOMContentLoaded", registrarNotificaciones);
+
+</script>
+
+<script>
+angular.module('refugioApp', [])
+.controller('PadrinosCtrl', function($scope, $http, $window) {
+  const apiUrl = "../php/padrinos.php";
+
+  // 🧠 Mantener estado de conexión entre páginas
+  const estadoGuardado = localStorage.getItem('offline');
+  $scope.offline = estadoGuardado ? JSON.parse(estadoGuardado) : !$window.navigator.onLine;
+
+  // 🐾 Cargar padrinos guardados localmente
+  $scope.padrinos = JSON.parse(localStorage.getItem('padrinos')) || [];
+  $scope.newPadrino = {};
+
+  // 🟢 Cargar padrinos desde servidor o usar locales si está offline
+  $scope.cargarPadrinos = function() {
+    if (!$scope.offline && $window.navigator.onLine) {
+      $http.get(apiUrl).then(res => {
+        if (Array.isArray(res.data)) {
+          const serverPadrinos = res.data;
+          const localesPendientes = $scope.padrinos.filter(p => p.offline || p.offlineEdit);
+          const idsServer = serverPadrinos.map(p => p.idPadrino);
+          const combinados = [...serverPadrinos];
+
+          localesPendientes.forEach(lp => {
+            if (!idsServer.includes(lp.idPadrino)) combinados.push(lp);
+          });
+
+          $scope.padrinos = combinados;
+          localStorage.setItem('padrinos', JSON.stringify($scope.padrinos));
+        }
+      }).catch(() => {
+        console.warn("⚠ No se pudo conectar al servidor — modo offline activado");
+        $scope.offline = true;
+        localStorage.setItem('offline', true);
+      });
+    } else {
+      console.warn("Modo offline — usando datos de localStorage");
+    }
+  };
+
+  // 🐶 Agregar padrino
+  $scope.addPadrino = function() {
+    if (!$scope.newPadrino.nombrePadrino) return alert("Por favor completa el nombre");
+
+    const maxId = $scope.padrinos.length ? Math.max(...$scope.padrinos.map(p => p.idPadrino || 0)) : 0;
+    const nextId = maxId + 1;
+    const nuevo = angular.copy($scope.newPadrino);
+    nuevo.idPadrino = nextId;
+
+    if (!$scope.offline && $window.navigator.onLine) {
+      $http.post(apiUrl, nuevo).then(res => {
+        if (res.data && res.data.idPadrino) nuevo.idPadrino = res.data.idPadrino;
+        $scope.padrinos.push(nuevo);
+        localStorage.setItem('padrinos', JSON.stringify($scope.padrinos));
+        $scope.newPadrino = {};
+      }).catch(() => {
+        alert("Error al guardar en servidor. Se guardará localmente.");
+        nuevo.offline = true;
+        $scope.padrinos.push(nuevo);
+        localStorage.setItem('padrinos', JSON.stringify($scope.padrinos));
+        $scope.newPadrino = {};
+      });
+    } else {
+      nuevo.offline = true;
+      $scope.padrinos.push(nuevo);
+      localStorage.setItem('padrinos', JSON.stringify($scope.padrinos));
+      $scope.newPadrino = {};
+    }
+  };
+
+  // ✏️ Abrir modal de edición
+  $scope.openEditModal = function(padrino) {
+    $scope.editPadrinoData = angular.copy(padrino);
+    $scope.selectedPadrino = padrino;
+    document.getElementById('editModal').style.display = 'flex';
+  };
+
+  $scope.closeEditModal = function() {
+    document.getElementById('editModal').style.display = 'none';
+  };
+
+  // 💾 Guardar cambios de edición
+  $scope.saveEdit = function() {
+    angular.extend($scope.selectedPadrino, $scope.editPadrinoData);
+    if (!$scope.offline && $window.navigator.onLine) {
+      $http.put(apiUrl, $scope.selectedPadrino).then(() => {
+        localStorage.setItem('padrinos', JSON.stringify($scope.padrinos));
+      }).catch(() => {
+        $scope.selectedPadrino.offlineEdit = true;
+        localStorage.setItem('padrinos', JSON.stringify($scope.padrinos));
+      });
+    } else {
+      $scope.selectedPadrino.offlineEdit = true;
+      localStorage.setItem('padrinos', JSON.stringify($scope.padrinos));
+    }
+    $scope.closeEditModal();
+  };
+
+  // 🗑️ Eliminar padrino
+  $scope.removePadrino = function(idPadrino) {
+    if (!confirm("¿Deseas eliminar este padrino?")) return;
+    $scope.padrinos = $scope.padrinos.filter(p => p.idPadrino !== idPadrino);
+    localStorage.setItem('padrinos', JSON.stringify($scope.padrinos));
+
+    if (!$scope.offline && $window.navigator.onLine) {
+      $http.delete(apiUrl + "?id=" + idPadrino).catch(() => {
+        console.warn("Error al eliminar en servidor, ya eliminado localmente");
+      });
+    }
+  };
+
+  // 🔁 Sincronizar datos offline → online
+  function sincronizarDatos() {
+    const pendientes = $scope.padrinos.filter(p => p.offline || p.offlineEdit);
+    pendientes.forEach(p => {
+      $http.post(apiUrl, p).then(res => {
+        delete p.offline;
+        delete p.offlineEdit;
+        if (res.data.idPadrino) p.idPadrino = res.data.idPadrino;
+        localStorage.setItem('padrinos', JSON.stringify($scope.padrinos));
+      }).catch(() => console.warn("No se pudo sincronizar:", p.nombrePadrino));
+    });
+  }
+
+  // 🌐 Detectar cambios de conexión
+  $window.addEventListener('online', () => {
+    $scope.offline = false;
+    localStorage.setItem('offline', false);
+    $scope.$applyAsync();
+    sincronizarDatos();
+    $scope.cargarPadrinos();
+  });
+
+  $window.addEventListener('offline', () => {
+    $scope.offline = true;
+    localStorage.setItem('offline', true);
+    $scope.$applyAsync();
+  });
+
+  // 🚀 Inicial
+  $scope.cargarPadrinos();
+
+  // ⚡ Cerrar sesión
+  $scope.cerrarSesion = function() {
+    if (confirm("¿Deseas cerrar sesión?")) window.location.href="../index.html";
+  };
+});
+</script>
+
+  <script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/testdashboard1/pwa-sw.js', { scope: '/testdashboard1/' })
+      .then(reg => console.log("✅ SW registrado:", reg.scope))
+      .catch(err => console.error("❌ Error al registrar SW:", err));
+  }
+  </script>
+
+</body>
+</html>

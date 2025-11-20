@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="es" ng-app="refugioApp">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Notificaciones - Refugio Animal</title>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+  <link rel="stylesheet" href="../css/index.css">
+
+  <style>
+    :root {
+      --main-color: #4CAF50;
+      --accent-color: #388E3C;
+      --danger-color: #f44336;
+      --info-color: #2196F3;
+    }
+
+    p[ng-if="offline"] { color: var(--danger-color); font-weight:bold; }
+    p[ng-if="!offline"] { color: var(--info-color); font-weight:bold; }
+
+    .notifications-list ul { list-style:none; padding:0; margin:0; }
+    .notifications-list li { padding:0.6rem 0; border-bottom:1px solid #ddd; }
+    .notifications-list li strong { color: var(--main-color); }
+
+    .side-panel {
+      position:fixed; top:0; right:-300px; width:300px; height:100%;
+      background:#f9f9f9; transition:0.3s; padding:1rem;
+      box-shadow:-3px 0 6px rgba(0,0,0,0.1); z-index:1000;
+    }
+    .side-panel.open { right:0; }
+    .side-panel-header { display:flex; justify-content:space-between; align-items:center;
+      margin-bottom:1rem; font-weight:bold; font-size:1.2rem; }
+    .side-panel-content label { display:block; margin-bottom:0.5rem; }
+  </style>
+
+  <!-- 🔥 Firebase SDK -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
+    import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-messaging.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDYdFd-39KDzADVcfurLdT9_W2cAIChFRA",
+      authDomain: "refugioanimal-b6096.firebaseapp.com",
+      projectId: "refugioanimal-b6096",
+      storageBucket: "refugioanimal-b6096.firebasestorage.app",
+      messagingSenderId: "122878637057",
+      appId: "1:122878637057:web:951a15ed750ce8fca27c00",
+      measurementId: "G-80E0ZTSZWP"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const messaging = getMessaging(app);
+
+    async function solicitarPermisoYToken() {
+      console.log("🔔 Solicitando permiso de notificaciones...");
+      const permiso = await Notification.requestPermission();
+
+      if (permiso === "granted") {
+        console.log("✅ Permiso concedido");
+
+        try {
+          const registration = await navigator.serviceWorker.register('/testdashboard1/firebase-messaging-sw.js', {
+            scope: '/testdashboard1/'
+          });
+
+          const token = await getToken(messaging, {
+            vapidKey: "BJI5wstaYYYL2QXhnns6lVCFU8SzjT5_yUlEwJ5qrSk3v5dYiCe37cLyetXNQ0Cn3IlYHAKrrEhOdYQe1TwbVNo",
+            serviceWorkerRegistration: registration
+          });
+
+          if (token) {
+            console.log("🔑 Token del dispositivo:", token);
+            // Enviar token al backend
+            await fetch("../php/guardar_token.php", {
+              method: "POST",
+              headers: { "Content-Type": "application/x-www-form-urlencoded" },
+              body: "token=" + encodeURIComponent(token)
+            });
+          } else {
+            console.warn("⚠️ No se generó token (verifica VAPID)");
+          }
+        } catch (err) {
+          console.error("❌ Error al obtener token:", err);
+        }
+      } else {
+        console.warn("🚫 Permiso denegado para notificaciones");
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", solicitarPermisoYToken);
+
+    // 💬 Notificaciones en primer plano
+    onMessage(messaging, (payload) => {
+      console.log("📩 Notificación en primer plano:", payload);
+      new Notification(payload.notification.title, {
+        body: payload.notification.body,
+        icon: payload.notification.icon
+      });
+    });
+  </script>
+</head>
+
+<body ng-controller="NotificationsController">
+<header>
+  <div class="header-left">
+    <div class="logo"><img src="../resources/veterinaria_bigotes.png" alt="Logo Refugio Animal"></div>
+    <h1>Refugio Animal</h1>
+  </div>
+  <nav>
+    <a href="./mascotas.html">Mascotas</a>
+    <a href="./padrinos.html">Padrinos</a>
+    <a href="./apoyos.html">Apoyos</a>
+    <a href="./notifications.html">Notificaciones</a>
+    <a href="#" ng-click="cerrarSesion()">Cerrar sesión</a>
+  </nav>
+</header>
+
+<main>
+  <div class="container">
+    <h2>🔔 Notificaciones</h2>
+    <p ng-if="offline">⚠ Estás en modo offline (usando datos locales)</p>
+    <p ng-if="!offline">🟢 Conectado al servidor</p>
+
+    <div class="notifications-list">
+      <ul>
+        <li ng-repeat="note in notifications track by note.idNotificacion">
+          <strong>{{note.tipo}} - {{note.accion}}</strong>: {{note.mensaje}}
+          <small style="color: gray;">({{note.fecha | date:'short'}})</small>
+        </li>
+        <li ng-if="notifications.length === 0">No hay notificaciones nuevas.</li>
+      </ul>
+    </div>
+
+    <button ng-click="clearNotifications()" ng-disabled="notifications.length === 0">Limpiar notificaciones</button>
+  </div>
+
+  <div id="sidePanel" class="side-panel">
+    <div class="side-panel-header">
+      ⚙️ Configuración
+      <button id="closePanelBtn" style="background:none;border:none;font-size:1.5rem;cursor:pointer;">&times;</button>
+    </div>
+    <div class="side-panel-content">
+      <label><input type="checkbox"> Cambiar idioma</label>
+      <label><input type="checkbox"> Ajustar notificaciones</label>
+    </div>
+  </div>
+</main>
+
+<script>
+angular.module('refugioApp', [])
+.controller('NotificationsController', function($scope, $http, $window) {
+  const apiUrl = "../php/notificaciones.php";
+
+  const estadoGuardado = localStorage.getItem('offline');
+  $scope.offline = estadoGuardado ? JSON.parse(estadoGuardado) : !$window.navigator.onLine;
+  $scope.notifications = JSON.parse(localStorage.getItem('notifications')) || [];
+
+  // 🔄 Cargar notificaciones
+  $scope.loadNotifications = function() {
+    if (!$scope.offline && $window.navigator.onLine) {
+      $http.get(apiUrl).then(res => {
+        if (Array.isArray(res.data)) {
+          const serverNotifs = res.data;
+          const pendientes = $scope.notifications.filter(n => n.offline);
+          const idsServer = serverNotifs.map(n => n.id);
+          const combinadas = [...serverNotifs];
+          pendientes.forEach(p => { if (!idsServer.includes(p.id)) combinadas.push(p); });
+          $scope.notifications = combinadas;
+          localStorage.setItem('notifications', JSON.stringify($scope.notifications));
+        }
+      }).catch(() => {
+        console.warn("⚠ No se pudo conectar al servidor, usando local");
+        $scope.notifications = JSON.parse(localStorage.getItem('notifications')) || [];
+      });
+    } else {
+      $scope.notifications = JSON.parse(localStorage.getItem('notifications')) || [];
+    }
+  };
+
+  // 🗑️ Limpiar todas las notificaciones
+  $scope.clearNotifications = function() {
+    if (!confirm("¿Deseas limpiar todas las notificaciones?")) return;
+    $scope.notifications = [];
+    localStorage.removeItem('notifications');
+    if (!$scope.offline && $window.navigator.onLine) {
+      $http.delete(apiUrl).catch(() => console.warn("No se pudo limpiar en el servidor"));
+    }
+  };
+
+  // 🔒 Cerrar sesión
+  $scope.cerrarSesion = function() {
+    if (confirm("¿Deseas cerrar sesión?")) window.location.href="../index.html";
+  };
+
+  function sincronizarNotifications() {
+    const pendientes = $scope.notifications.filter(n => n.offline);
+    pendientes.forEach(n => {
+      $http.post(apiUrl, n).then(res => {
+        if (res.data && res.data.id) n.id = res.data.id;
+        delete n.offline;
+        localStorage.setItem('notifications', JSON.stringify($scope.notifications));
+      }).catch(() => console.warn("No se pudo sincronizar notificación:", n.id));
+    });
+  }
+
+  $window.addEventListener('online', () => {
+    console.log("🟢 Conectado");
+    $scope.offline = false;
+    localStorage.setItem('offline', false);
+    $scope.$applyAsync();
+    sincronizarNotifications();
+    $scope.loadNotifications();
+  });
+  $window.addEventListener('offline', () => {
+    console.log("🔴 Sin conexión");
+    $scope.offline = true;
+    localStorage.setItem('offline', true);
+    $scope.$applyAsync();
+  });
+
+  $scope.loadNotifications();
+
+  // Panel lateral
+  document.addEventListener('DOMContentLoaded', function() {
+    const panel = document.getElementById('sidePanel');
+    const closeBtn = document.getElementById('closePanelBtn');
+    if(closeBtn){ closeBtn.addEventListener('click', () => panel.classList.remove('open')); }
+  });
+
+  // PWA + Firebase SW
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/testdashboard1/pwa-sw.js', { scope: '/testdashboard1/' })
+    .then(reg => console.log("✅ SW principal registrado:", reg.scope))
+    .catch(err => console.error("❌ Error SW:", err));
+  }
+});
+</script>
+</body>
+</html>

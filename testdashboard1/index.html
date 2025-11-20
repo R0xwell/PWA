@@ -1,0 +1,86 @@
+<!-- cloudflared tunnel --url http://localhost:80 -->
+<!--  ngrok http 80
+  start chrome --unsafely-treat-insecure-origin-as-secure="https://marc-preimperial-charmain.ngrok-free.dev" --user-data-dir="C:\chromeDev" -->
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Refugio Animal</title>
+
+  <!-- AngularJS solo para compatibilidad básica -->
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="css/home.css">
+</head>
+
+<body ng-app>
+  <header>
+    <div class="header-left">
+      <div class="logo">
+        <img src="resources/veterinaria_bigotes.png" alt="Logo Refugio Animal">
+      </div>
+      <h1>Refugio Animal</h1>
+    </div>
+    <nav>
+      <a href="views/home.html">Inicio</a>
+    </nav>
+  </header>
+
+  <main>
+    <div class="container">
+      <h2>Bienvenido al Refugio Animal</h2>
+      <p>Ayúdanos a dar una segunda oportunidad a los animales rescatados. Aquí podrás conocer a nuestras mascotas, padrinos y apoyos recibidos.</p>
+      <p>Explora las secciones del menú para conocer más sobre cómo apoyarnos.</p>
+    </div>
+
+    <!-- Imágenes del inicio -->
+    <div class="imagenestest">
+      <img src="https://th.bing.com/th/id/R.b4a35952996b0363fb3b3823d171a8e8?rik=yPmvd9x3vMBR5Q&riu=http%3a%2f%2fc.files.bbci.co.uk%2f48DD%2fproduction%2f_107435681_perro1.jpg&ehk=LcxYxmKeK6CKzYChIUt5UGL2G3Zapsyy1nEJgOZAq3M%3d&risl=&pid=ImgRaw&r=0" alt="Bienvenida1">
+      <img src="https://th.bing.com/th/id/R.6307e744b77f0d75c331314445c8e35c?rik=VkUP4SEEnu4Y3g&riu=http%3a%2f%2f4.bp.blogspot.com%2f-iUmDr6ACLk0%2fVaz8A2iOHRI%2fAAAAAAAAABM%2fnT_rdVS2IyM%2fs1600%2fperro-4.jpg&ehk=mFP%2fymTsL4Nq2KSnB9dtSJb%2fDW1Vu3GfLaSQJV7axB0%3d&risl=&pid=ImgRaw&r=0" alt="Bienvenida2">
+    </div>
+
+    <!-- Galería -->
+    <section class="galeria">
+      <h3>Nuestros amigos peludos 🐶🐱</h3>
+      <div class="imagenes-galeria">
+        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSjhLfdHxkRbS03FmtbNmX_RB2Zdlq_uHrqxw&s" alt="Gato 1">
+        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQshcDYQPTnlufRVdrYtkJakFSYMgOBcrcNTg&s" alt="Perro">
+        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRGe-iMqKGs1IH4HE04L3wzElT0tzwgw5bULg&s" alt="Gato 2">
+      </div>
+    </section>
+
+    <!-- Formulario de contacto -->
+    <section class="contacto">
+      <h3>📩 Contáctanos</h3>
+      <form id="contactoForm">
+        <label>Nombre:</label>
+        <input type="text" name="nombre" required placeholder="Tu nombre...">
+        <label>Correo electrónico:</label>
+        <input type="email" name="correo" required placeholder="tucorreo@example.com">
+        <label>Mensaje:</label>
+        <textarea name="mensaje" rows="4" required placeholder="Escribe tu mensaje aquí..."></textarea>
+        <button type="submit">Enviar mensaje</button>
+      </form>
+    </section>
+  </main>
+
+  <script>
+    // --- Formulario de contacto ---
+    document.getElementById('contactoForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      alert('¡Gracias por contactarnos! Te responderemos pronto 🐾');
+      this.reset();
+    });
+
+    // --- Registro del Service Worker (PWA) ---
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./pwa-sw.js', { scope: './' })
+        .then(reg => console.log("✅ SW registrado:", reg.scope))
+        .catch(err => console.error("❌ Error al registrar SW:", err));
+    }
+  </script>
+</body>
+</html>

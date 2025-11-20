@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "refugioanimal-b6096",
+  "private_key_id": "d6c2932c19467cc6b3ed8d2a285cb81f1f01d228",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDAy4+VrPwoGDfk\nX3DQ3kstu3xK1zC65DxNUFXCVvBRs5h68Tl9n1OTaGPkXK4rxp5gHnZOXJO/hPC+\naRGQwemrhQ8lkn2BVri2ds6y8sKQDgAC4hp39iLpW7QSNuTA0WwVF5R53o8B4JCR\npVZx8MK62dMyC4Q09fTRCmcHwiKt6RbB8jHkXAwDVo6oyK1pLmEu8KYFccko+6Lk\nLzUWUh+IBMa5gxk1PcDqXicemfUW2iMdnsTuSJ6MT4YUVHIGb/zzR/omM49vSu4P\n4R+P3D1hQUALK4JE/1kmpmr4CVn3palrcFzGEyKG+bJ1hDR/GhG7q7fxw7QO4zZs\nupF1TEnBAgMBAAECggEASWhYnAN5IWUTRvvGD2lMk7Wq3i4wakDD6yY2+R+0Mk+h\nM9KMctYK8voQ6t8VHCrsm6mNn0mlogsixUVpQEZtS/cGbOZprikQfL0g98byKPqD\nq5VewaVw5oyZtEO9duNmdWN8j6ibp/nS4fnjv8+Nvap5vTjgVm/+DugYkb4sCS4o\nuD0eW3psVVR5RQK6iB6QAfM3EBi15UKLLeRg6cpHJMzfrLx3vKBMoo0+2lzLNMLF\n2DbdTk0J+rrex2GHFmG6jdB4Y6CtuUL68uBl+aBpN6TycUxkxRZpyOkXBGy0NBEY\n6XNl78qlq0WPhbHmLf0YKK2Lvxx/vyUJjsEXU5fKhwKBgQDy0MmquNnX30N3K+Ot\nQsliekL5mNpJBuKI3v2rYLj5e1mGuM7Dw+EuPiwWSRMrlpJ+YXZSFQTrfcrYJHwv\n8RJpoH2lCW5mTIBMsLKS0R1DLVBwnOvXozQqdTjpAcOIyWqKEVV4uhant1lTOYpg\nbsbDDBoJrj5lcQiZtNCQ8nYZVwKBgQDLQ3lFaILoigVjxPmQgc/t3tiY7xGyT4fw\n/rBLx1gwVVq3ataawJEFErx/ZnXOwNCYlU9R8OSIh7HpYWzPWhkfVsKoFjqzVNvf\nq+qMiidr6fszq2zfWobvZsdiEk2rS9CnaEzo/WBfcM312bHXeI9czf2Cc2MYMiLE\ncZd3g7kOpwKBgEyTQ8YvXaQSqPggQ0EU2uXPoOeOKOj23uJDUMSHUE59dBJknfBn\nCdDHkqfEi+MnLTPmEKZ6Mn8BwMLBXtjPsfrVvkoZ21MvtRZ6cxaSFCRnWgLpugbb\nVUw+g6AYCk5NFuhL5ySXqyVhUS5J6zXWOaCxZFTBOrRLHWc7+rp7fHspAoGBAJp0\ng0qCyDb76myN2TY97krK87wCrmfYl2xBnKV4rULNGUoXHUwq2AgK3MHSkeKyEdBg\nZQ3XB1HYCxFUvuIxjLWLsA8aFTEAYrPsZya0NJCEFCaHNQvkNnTknM2hKvPngH41\ne3vwTbM4fMk8yy74pbfXr7PZCovwTQsJZhejOJQxAoGAcY2DKjFyIxpWKFaL7o4f\nr1Jv1n0MmlUvX5SCWXokEeW1ycbUCZVduZlxWM8/PxXXWDgnQ11dGpWozgznjS9H\ntG1ILeLl+QWmralfwmlbzmG6r96DF1aaU2FYQ7geLhO3hd+LOoXnc0K43/9DxyYv\nUUBQVJPoKDfYGJDox25ePZs=\n-----END PRIVATE KEY-----\n",
+  "client_email": "firebase-adminsdk-fbsvc@refugioanimal-b6096.iam.gserviceaccount.com",
+  "client_id": "102551586676068707959",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-fbsvc%40refugioanimal-b6096.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
